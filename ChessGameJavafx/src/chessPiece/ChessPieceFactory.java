@@ -33,22 +33,22 @@ public class ChessPieceFactory {
     }
     
     private Piece makeKnight(PieceTeam type, int x, int y) {
-        Piece piece = new Rook(type, x, y);
+        Piece piece = new Knight(type, x, y);
         return piece;
     }
     
     private Piece makeQueen(PieceTeam type, int x, int y) {
-        Piece piece = new Rook(type, x, y);
+        Piece piece = new Queen(type, x, y);
         return piece;
     }
     
     private Piece makeBishop(PieceTeam type, int x, int y) {
-        Piece piece = new Rook(type, x, y);
+        Piece piece = new Bishop(type, x, y);
         return piece;
     }
     
     private Piece makeKing(PieceTeam type, int x, int y) {
-        Piece piece = new Rook(type, x, y);
+        Piece piece = new King(type, x, y);
         return piece;
     }
 }

@@ -98,8 +98,18 @@ public class ChessApp extends Application {
         	piece = chessPieceFactory.makePiece(PieceType.PAWN, PieceTeam.WHITE, x, y);
         }
         else if (y == 7) {
-        	if(x == 0) {
+        	if(x == 0 || x == 7) {
         		piece = chessPieceFactory.makePiece(PieceType.ROOK, PieceTeam.WHITE, x, y);
+        	} else if(x == 1 || x == 6) {
+        		piece = chessPieceFactory.makePiece(PieceType.BISHOP, PieceTeam.WHITE, x, y);
+        	} else if(x == 2 || x == 5) {
+        		piece = chessPieceFactory.makePiece(PieceType.KNIGHT, PieceTeam.WHITE, x, y);
+        	}
+ 
+        	else if(x == 3) {
+        		piece = chessPieceFactory.makePiece(PieceType.QUEEN, PieceTeam.WHITE, x, y);
+        	}  else if(x == 4) {
+        		piece = chessPieceFactory.makePiece(PieceType.KING, PieceTeam.WHITE, x, y);
         	}
         }
         return piece;

@@ -1,0 +1,39 @@
+package chessGame;
+
+import chessPiece.Piece;
+import chessPiece.PieceMoveResult;
+import utils.MathUtils;
+
+public class Board {
+	public static final int TILE_SIZE = 100,
+							WIDTH = 8,
+							HEIGHT = 8;
+
+    private Tile[][] board = new Tile[WIDTH][HEIGHT];
+    
+    private MathUtils mathUtils = new MathUtils();
+    
+    public PieceMoveResult tryMove(Piece piece, int newX, int newY) {
+    	return piece.move(newX, newY, this);
+    }
+
+    public int toBoard(double pixel) {
+        return (int)(pixel + TILE_SIZE / 2) / TILE_SIZE;
+    }
+    
+    public Tile getTile(int x, int y) {
+    	if(mathUtils.withinRangeInclusive(x, 0, WIDTH - 1) && mathUtils.withinRangeInclusive(y, 0, WIDTH - 1)) {
+    		return board[x][y];
+    	} else {
+    		throw new IndexOutOfBoundsException(String.format("Cannot get tile on square [%d, %d]", x, y));
+    	}
+    }
+
+	public void setTile(int x, int y, Tile tile) {
+    	if(mathUtils.withinRangeInclusive(x, 0, WIDTH - 1) && mathUtils.withinRangeInclusive(y, 0, WIDTH - 1)) {
+    		board[x][y] = tile;
+    	} else {
+    		throw new IndexOutOfBoundsException(String.format("Cannot set tile on square [%d, %d]", x, y));
+    	}		
+	}
+}
