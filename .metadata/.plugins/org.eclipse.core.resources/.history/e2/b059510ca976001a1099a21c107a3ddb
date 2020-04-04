@@ -4,9 +4,7 @@ import chessGame.Board;
 import enumTypes.MoveType;
 import enumTypes.PieceTeam;
 import javafx.scene.paint.Color;
-import lombok.Getter;
 
-@Getter
 public class Pawn extends Piece{
 	
 	private boolean isFirstMove;
@@ -21,7 +19,9 @@ public class Pawn extends Piece{
 
 		final int oldX = (int)(this.getOldX() + 100 / 2) / 100,
         		  oldY = (int)(this.getOldY() + 100 / 2) / 100;      
-		        
+		
+		System.out.println(oldX);
+        
         final boolean isValidNoneKillNormalMove = newX == oldX && newY == oldY + this.getType().getMoveDir(),
         			  isValidNoneKillFirstMove = newX == oldX && newY == oldY + this.getType().getMoveDir() * 2,
         			  isPieceThere = board.getTile(newX, newY).hasPiece(),
@@ -34,10 +34,10 @@ public class Pawn extends Piece{
 				pieceMoveResult = new PieceMoveResult(MoveType.NORMAL);
 			}
 		} else if(isKillMove && isEnemyThere) {
-        	pieceMoveResult = new PieceMoveResult(MoveType.KILL, board.getTile(newX, newY).getPiece());
+        	isFirstMove = false;
+        	return new PieceMoveResult(MoveType.KILL, board.getTile(newX, newY).getPiece());
         } 
-
-    	isFirstMove = false;
+        	
         return pieceMoveResult != null ? pieceMoveResult : new PieceMoveResult(MoveType.NONE);
 	}
 }

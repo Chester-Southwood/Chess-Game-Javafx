@@ -4,7 +4,6 @@ import chessGame.Board;
 import enumTypes.MoveType;
 import enumTypes.PieceTeam;
 import javafx.scene.paint.Color;
-import lombok.Getter;
 
 @Getter
 public class Pawn extends Piece{
