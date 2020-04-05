@@ -1,0 +1,112 @@
+package chessPiece;
+
+import java.awt.Point;
+
+import chessGame.Board;
+import enumTypes.MoveType;
+import enumTypes.PieceTeam;
+import javafx.scene.paint.Color;
+
+public class Queen extends Piece{
+
+	public Queen(PieceTeam type, int x, int y) {
+		super(type, x, y, Color.DARKGREEN);
+	}
+
+	@Override
+	public PieceMoveResult move(int newX, int newY, Board board) {
+		final int oldX = (int)(this.getOldX() + 100 / 2) / 100,
+				  oldY = (int)(this.getOldY() + 100 / 2) / 100;     
+        
+        final boolean isVerticle = newX == oldX && newY != oldY,
+					  isHorizontal = newX != oldX && newY == oldY,
+					  isDiagonal = Math.abs(newX - oldX) == Math.abs(newY - oldY),
+					  isLegalMovement = (isVerticle || isHorizontal || isDiagonal),
+					  isPieceThere = board.getTile(newX, newY).hasPiece(),
+					  isAllyPieceThere = isPieceThere ? board.getTile(newX, newY).getPiece().getType() == this.getType() : false;
+
+        if (isLegalMovement && !isAllyPieceThere) {
+        	if(isVerticle) { //has same x axis
+            	System.out.println("HIT VERTICLE");
+        		int highest = Math.max(oldY, newY);
+        		int lowest = Math.min(oldY, newY) + 1;
+        		
+        		System.out.println("highest is " + highest);
+        		System.out.println("lowest is " + (lowest));
+
+        		while(lowest < highest) {
+        			System.out.println(lowest);
+        			if(board.getTile(newX, lowest).hasPiece()) {
+        				System.out.println("ILLEGAL MOVE");
+        				return new PieceMoveResult(MoveType.NONE);
+        			}
+        			lowest++;
+        		}
+        	}
+        	
+        	if(isHorizontal) { //has same x axis'
+            	System.out.println("HIT HORIZONTAL");
+        		int highest = Math.max(oldX, newX);
+        		int lowest = Math.min(oldX, newX) + 1;
+        		
+        		System.out.println("highest is " + highest);
+        		System.out.println("lowest is " + (lowest));
+
+        		while(lowest < highest) {
+        			System.out.println(lowest);
+        			if(board.getTile(lowest, newY).hasPiece()) {
+        				System.out.println("ILLEGAL MOVE");
+        				return new PieceMoveResult(MoveType.NONE);
+        			}
+        			lowest++;
+        		}
+        	}
+        	
+        	if(isDiagonal) {
+        		System.out.println("HIT DIAGONAL");
+        		boolean isTopRightToBottomLeft = oldX < newX && oldY < newY;
+        		boolean isBottomLeftToTopRight = oldX > newX && oldY > newY;
+        		boolean isTopLeftToBottomRight = oldX < newX && oldY > newY;
+        		boolean isBottomRightToTopLeft = oldX < newX && oldY < newY;
+        		if(isTopRightToBottomLeft) {
+    				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+    					if(board.getTile(oldX + i, oldY + i).hasPiece()) {
+    						return new PieceMoveResult(MoveType.NONE);
+    					}
+    				}
+        		} else if(isBottomLeftToTopRight) {
+    				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+    					if(board.getTile(oldX - i, oldY - i).hasPiece()) {
+    						return new PieceMoveResult(MoveType.NONE);
+    					}
+    				}
+        		} else if(isBottomLeftToTopRight) {
+    				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+    					if(board.getTile(oldX - i, oldY - i).hasPiece()) {
+    						return new PieceMoveResult(MoveType.NONE);
+    					}
+    				}
+        		} else /*if(isBottomLeftToTopRight)*/ {
+    				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+    					if(board.getTile(oldX - i, oldY - i).hasPiece()) {
+    						return new PieceMoveResult(MoveType.NONE);
+    					}
+    				}
+        		}
+        	}
+        	
+        	System.out.println("NEITHER");
+        	
+            final boolean isEnemyPieceThere = isPieceThere 
+            		? board.getTile(newX, newY).getPiece().getType() != this.getType() 
+            		: false;
+            
+        	return isEnemyPieceThere 
+        			? new PieceMoveResult(MoveType.KILL, board.getTile(newX, newY).getPiece())
+        			: new PieceMoveResult(MoveType.NORMAL);
+        } else {
+        	return new PieceMoveResult(MoveType.NONE);
+        }
+	}
+
+}

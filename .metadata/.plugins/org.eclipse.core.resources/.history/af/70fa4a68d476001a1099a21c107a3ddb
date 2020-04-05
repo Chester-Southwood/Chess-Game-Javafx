@@ -1,0 +1,66 @@
+package chessPiece;
+
+import chessGame.Board;
+import enumTypes.MoveType;
+import enumTypes.PieceTeam;
+import javafx.scene.paint.Color;
+
+public class Bishop extends Piece{
+
+	public Bishop(PieceTeam type, int x, int y) {
+		super(type, x, y, Color.YELLOW);
+	}
+
+	@Override
+	public PieceMoveResult move(int newX, int newY, Board board) {
+		final int oldX = (int)(this.getOldX() + 100 / 2) / 100,
+				  oldY = (int)(this.getOldY() + 100 / 2) / 100;      
+
+        final boolean isDiagonal = Math.abs(newX - oldX) == Math.abs(newY - oldY),
+					  isLegalMovement = isDiagonal,
+					  isPieceThere = board.getTile(newX, newY).hasPiece(),
+					  isAllyPieceThere = isPieceThere ? board.getTile(newX, newY).getPiece().getType() == this.getType() : false;
+
+        if (isLegalMovement && !isAllyPieceThere) {
+    		boolean isTopRightToBottomLeft = oldX < newX && oldY < newY;
+    		boolean isBottomLeftToTopRight = oldX > newX && oldY > newY;
+    		//boolean isTopLeftToBottomRight = oldX < newX && oldY > newY; //keep for reference
+    		boolean isBottomRightToTopLeft = oldX > newX && oldY < newY;
+    		if(isTopRightToBottomLeft) {
+				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+					if(board.getTile(oldX + i, oldY + i).hasPiece()) {
+						return new PieceMoveResult(MoveType.NONE);
+					}
+				}
+    		} else if(isBottomLeftToTopRight) {
+				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+					if(board.getTile(oldX - i, oldY - i).hasPiece()) {
+						return new PieceMoveResult(MoveType.NONE);
+					}
+				}
+    		} else if(isBottomRightToTopLeft) {
+				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+					if(board.getTile(oldX - i, oldY + i).hasPiece()) {
+						return new PieceMoveResult(MoveType.NONE);
+					}
+				}
+    		} else /*if(isTopLeftToBottomRight)*/ {
+				for(int i = 1; Math.abs(newX - oldX) > i; i++) {
+					if(board.getTile(oldX + i, oldY - i).hasPiece()) {
+						return new PieceMoveResult(MoveType.NONE);
+					}
+				}
+    		}
+            final boolean isEnemyPieceThere = isPieceThere 
+            		? board.getTile(newX, newY).getPiece().getType() != this.getType() 
+            		: false;
+            
+        	return isEnemyPieceThere 
+        			? new PieceMoveResult(MoveType.KILL, board.getTile(newX, newY).getPiece())
+        			: new PieceMoveResult(MoveType.NORMAL);
+        } else {
+        	return new PieceMoveResult(MoveType.NONE);
+        }
+	}
+
+}

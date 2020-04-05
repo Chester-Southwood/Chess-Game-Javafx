@@ -1,6 +1,6 @@
 package chessGame;
 
-import chessPiece.Piece;
+import chessPieces.Piece;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import lombok.Getter;

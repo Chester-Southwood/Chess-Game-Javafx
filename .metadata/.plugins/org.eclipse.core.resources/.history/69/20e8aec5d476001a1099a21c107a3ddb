@@ -1,0 +1,44 @@
+package chessPieceComponents;
+
+import chessGame.Board;
+import chessPieceComponents.PieceMoveResult;
+import enumTypes.MoveType;
+import enumTypes.PieceTeam;
+import javafx.scene.paint.Color;
+import lombok.Getter;
+
+@Getter
+public class Pawn extends Piece{
+	
+	private boolean isFirstMove;
+
+	public Pawn(PieceTeam type, int x, int y) {
+		super(type, x, y, Color.GRAY);
+		this.isFirstMove = true;
+	}
+
+	@Override
+	public PieceMoveResult move(int newX, int newY, Board board) {
+
+		final int oldX = (int)(this.getOldX() + 100 / 2) / 100,
+        		  oldY = (int)(this.getOldY() + 100 / 2) / 100;      
+		        
+        final boolean isValidNoneKillNormalMove = newX == oldX && newY == oldY + this.getType().getMoveDir(),
+        			  isValidNoneKillFirstMove = newX == oldX && newY == oldY + this.getType().getMoveDir() * 2,
+        			  isPieceThere = board.getTile(newX, newY).hasPiece(),
+        			  isEnemyThere = isPieceThere ? board.getTile(newX, newY).getPiece().getType() != this.getType() : false,
+					  isKillMove = Math.abs(newX - oldX) == 1 && Math.abs(newY - oldY) == 1;
+
+		PieceMoveResult pieceMoveResult = null;
+		if(!isPieceThere) {
+			if(isFirstMove && isValidNoneKillFirstMove || isValidNoneKillNormalMove) {
+				pieceMoveResult = new PieceMoveResult(MoveType.NORMAL);
+			}
+		} else if(isKillMove && isEnemyThere) {
+        	pieceMoveResult = new PieceMoveResult(MoveType.KILL, board.getTile(newX, newY).getPiece());
+        } 
+
+    	isFirstMove = false;
+        return pieceMoveResult != null ? pieceMoveResult : new PieceMoveResult(MoveType.NONE);
+	}
+}

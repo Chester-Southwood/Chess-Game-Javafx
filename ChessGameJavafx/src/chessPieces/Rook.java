@@ -1,0 +1,71 @@
+package chessPieces;
+
+import chessGame.Board;
+import chessPieceComponents.PieceMoveResult;
+import enumTypes.MoveType;
+import enumTypes.PieceTeam;
+import javafx.scene.paint.Color;
+import lombok.Getter;
+import lombok.Setter;
+
+public class Rook extends Piece{
+	
+	@Getter @Setter private boolean isFirstMove;
+
+	public Rook(PieceTeam type, int x, int y) {
+		super(type, x, y, Color.FIREBRICK);
+		isFirstMove = true;
+	}
+
+	@Override
+	public PieceMoveResult move(int newX, int newY, Board board) {
+		final int oldX = (int)(this.getOldX() + 100 / 2) / 100,
+				  oldY = (int)(this.getOldY() + 100 / 2) / 100; 
+        
+        final boolean isVerticle = newX == oldX && newY != oldY,
+					  isHorizontal = newX != oldX && newY == oldY,
+					  isLegalMovement = (isVerticle || isHorizontal),
+					  isPieceThere = board.getTile(newX, newY).hasPiece(),
+					  isAllyPieceThere = isPieceThere ? board.getTile(newX, newY).getPiece().getType() == this.getType() : false;
+
+        if (isLegalMovement && !isAllyPieceThere) {
+        	
+        	if(isVerticle) { //has same x axis
+        		int highest = Math.max(oldY, newY);
+        		int lowest = Math.min(oldY, newY) + 1;
+
+        		while(lowest < highest) {
+        			if(board.getTile(newX, lowest).hasPiece()) {
+        				return new PieceMoveResult(MoveType.NONE);
+        			}
+        			lowest++;
+        		}
+        	}
+        	
+        	else if(isHorizontal) { //has same x axis
+        		int highest = Math.max(oldX, newX);
+        		int lowest = Math.min(oldX, newX) + 1;
+
+        		while(lowest < highest) {
+        			if(board.getTile(lowest, newY).hasPiece()) {
+        				return new PieceMoveResult(MoveType.NONE);
+        			}
+        			lowest++;
+        		}
+        	}
+        	
+            final boolean isEnemyPieceThere = isPieceThere 
+            		? board.getTile(newX, newY).getPiece().getType() != this.getType() 
+            		: false;
+            		
+    		isFirstMove = false;
+            
+        	return isEnemyPieceThere 
+        			? new PieceMoveResult(MoveType.KILL, board.getTile(newX, newY).getPiece())
+        			: new PieceMoveResult(MoveType.NORMAL);
+        } else {
+        	return new PieceMoveResult(MoveType.NONE);
+        }
+	}
+
+}

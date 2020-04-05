@@ -1,0 +1,4 @@
+
+public class Test {
+	Point p1 = new Point()
+}

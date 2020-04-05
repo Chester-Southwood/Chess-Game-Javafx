@@ -1,0 +1,61 @@
+package chessPieces;
+
+import chessGame.Board;
+import chessPieceComponents.PieceMoveResult;
+import enumTypes.MoveType;
+import enumTypes.PieceTeam;
+import javafx.scene.paint.Color;
+
+public class King extends Piece{
+
+	public King(PieceTeam type, int x, int y) {
+		super(type, x, y, Color.DARKBLUE);
+	}
+
+	@Override
+	public PieceMoveResult move(int newX, int newY, Board board) {
+		final int oldX = (int)(this.getOldX() + 100 / 2) / 100,
+				  oldY = (int)(this.getOldY() + 100 / 2) / 100;      
+        
+        final boolean isVerticle = newX == oldX && newY != oldY && Math.abs(newY - oldY) == 1,
+					  isHorizontal = newX != oldX && newY == oldY && Math.abs(newX - oldX) == 1,
+					  isDiagonal = Math.abs(newX - oldX) == Math.abs(newY - oldY) && Math.abs(newY - oldY) == 1,
+					  isLegalMovement = (isVerticle || isHorizontal || isDiagonal),
+					  isPieceThere = board.getTile(newX, newY).hasPiece(),
+					  isAllyPieceThere = isPieceThere ? board.getTile(newX, newY).getPiece().getType() == this.getType() : false;
+
+        if (isLegalMovement && !isAllyPieceThere) {
+        	
+            final boolean isEnemyPieceThere = isPieceThere 
+            		? board.getTile(newX, newY).getPiece().getType() != this.getType() 
+            		: false;
+            
+        	return isEnemyPieceThere 
+        			? new PieceMoveResult(MoveType.KILL, board.getTile(newX, newY).getPiece())
+        			: new PieceMoveResult(MoveType.NORMAL);
+        } else if(newX != oldX && newY == oldY && Math.abs(newX - oldX) == 2) {
+        	//
+        	Piece possibleQueensRook = board.getTile(0, 0).getPiece();
+        	if(possibleQueensRook instanceof Rook && possibleQueensRook.getType() == this.getType()) {
+        		System.out.println("Maybe work");
+        		board.getTile(0, 0).getPiece().moveTo(3, 0);
+                board.getTile(0, 0).setPiece(null);
+                //board.getTile(0, 2).setPiece(board.getTile(0, 0).getPiece());
+                return new PieceMoveResult(MoveType.NORMAL);
+        	}
+        	Piece possibleKingsRook = board.getTile(7, 0).getPiece();
+        	if(possibleKingsRook instanceof Rook && possibleKingsRook.getType() == this.getType()) {
+        		System.out.println("Maybe work");
+        		board.getTile(7, 0).getPiece().moveTo(5, 0);
+                board.getTile(7, 0).setPiece(null);
+                //board.getTile(0, 2).setPiece(board.getTile(0, 0).getPiece());
+                return new PieceMoveResult(MoveType.NORMAL);
+        	}
+        	
+        }else if {
+        	
+        }
+        return new PieceMoveResult(MoveType.NONE);
+	}
+
+}

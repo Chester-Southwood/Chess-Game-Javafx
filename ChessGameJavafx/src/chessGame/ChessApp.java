@@ -1,8 +1,14 @@
 package chessGame;
 
-import chessPiece.PieceMoveResult;
-import chessPiece.ChessPieceFactory;
-import chessPiece.Piece;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.xml.transform.stream.StreamSource;
+
+import chessPieceComponents.PieceMoveResult;
+import chessPieces.ChessPieceFactory;
+import chessPieces.Piece;
 import enumTypes.MoveType;
 import enumTypes.PieceTeam;
 import enumTypes.PieceType;
@@ -19,11 +25,18 @@ public class ChessApp extends Application {
     
     private Group tileGroup = new Group();
     private Group pieceGroup = new Group();
+    private boolean isWhiteTurn = true;
     
     private ChessPieceFactory chessPieceFactory = new ChessPieceFactory();
     
     private void setOnMouseReleased(final Piece piece) {
         piece.setOnMouseReleased(e -> {
+        	
+            if(piece.getType() == PieceTeam.BLACK && isWhiteTurn || piece.getType() == PieceTeam.WHITE && !isWhiteTurn) {
+            	piece.abortMove();
+            	return;
+            }
+        	
             final int newX = chessBoard.toBoard(piece.getLayoutX()),
                       newY = chessBoard.toBoard(piece.getLayoutY());
 
@@ -33,21 +46,21 @@ public class ChessApp extends Application {
     				: chessBoard.tryMove(piece, newX, newY);
 
 
-            final int x0 = chessBoard.toBoard(piece.getOldX()),
-            		  y0 = chessBoard.toBoard(piece.getOldY());
-
+            final int oldX = chessBoard.toBoard(piece.getOldX()),
+            		  oldY = chessBoard.toBoard(piece.getOldY());
+            
             switch (result.getType()) {
                 case NONE:
                     piece.abortMove();
-                    break;
+                    return;
                 case NORMAL:
                     piece.moveTo(newX, newY);
-                    chessBoard.getTile(x0, y0).setPiece(null);
+                    chessBoard.getTile(oldX, oldY).setPiece(null);
                     chessBoard.getTile(newX, newY).setPiece(piece);
                     break;
                 case KILL:
                     piece.moveTo(newX, newY);
-                    chessBoard.getTile(x0, y0).setPiece(null);
+                    chessBoard.getTile(oldX, oldY).setPiece(null);
                     chessBoard.getTile(newX, newY).setPiece(piece);
 
                     Piece otherPiece = result.getPiece();
@@ -55,6 +68,20 @@ public class ChessApp extends Application {
                     pieceGroup.getChildren().remove(otherPiece);
                     break;
             }
+            
+            if(piece.getType() == PieceTeam.WHITE && newY == 0 || piece.getType() == PieceTeam.BLACK && newY == 7) {
+            	Piece newPiece = chessPieceFactory.makePiece(PieceType.QUEEN, piece.getType(), newX, newY);
+                chessBoard.getTile(newX, newY).setPiece(newPiece);
+                pieceGroup.getChildren().add(newPiece);
+                pieceGroup.getChildren().remove(piece);
+                setOnMouseReleased(newPiece);
+            }
+            
+            //TODO: Find a way to go through each each opposing piece to check for 'check', maybe observer pattern could help...
+            //List<Piece> pieces = pieceGroup.getChildren().stream().map(x -> (Piece) x).collect(Collectors.toList());
+            //pieces.forEach(a -> System.out.println(a.getType()));
+            
+            isWhiteTurn = !isWhiteTurn;
         });
     }
     
@@ -83,35 +110,30 @@ public class ChessApp extends Application {
         return root;
     }
     
-    private Piece generatePiece(final int x, final int y) {
+    private Piece generatePiece(final int x, final int y) { //TODO check param somehow, shouldn't return null
         Piece piece = null;
+        
+        PieceTeam currentTeam = y == 0 || y == 1 
+        		? PieceTeam.BLACK 
+				: y == 6 || y == 7 ? PieceTeam.WHITE : null; 
 
-        if(y == 0) {
-        	if(x == 0) {
-        		piece = chessPieceFactory.makePiece(PieceType.ROOK, PieceTeam.BLACK, x, y);
-        	}
-        }
-        else if (y == 1) {
-            piece = chessPieceFactory.makePiece(PieceType.PAWN, PieceTeam.BLACK, x, y);
-        }
-        else if (y == 6) {
-        	piece = chessPieceFactory.makePiece(PieceType.PAWN, PieceTeam.WHITE, x, y);
-        }
-        else if (y == 7) {
+        if(y == 0 || y == 7) {
         	if(x == 0 || x == 7) {
-        		piece = chessPieceFactory.makePiece(PieceType.ROOK, PieceTeam.WHITE, x, y);
+        		piece = chessPieceFactory.makePiece(PieceType.ROOK, currentTeam, x, y);
         	} else if(x == 1 || x == 6) {
-        		piece = chessPieceFactory.makePiece(PieceType.BISHOP, PieceTeam.WHITE, x, y);
+        		piece = chessPieceFactory.makePiece(PieceType.KNIGHT, currentTeam, x, y);
         	} else if(x == 2 || x == 5) {
-        		piece = chessPieceFactory.makePiece(PieceType.KNIGHT, PieceTeam.WHITE, x, y);
+        		piece = chessPieceFactory.makePiece(PieceType.BISHOP, currentTeam, x, y);
+        	} else if(x == 3) {
+        		piece = chessPieceFactory.makePiece(PieceType.QUEEN, currentTeam, x, y);
+        	} else if(x == 4) {
+        		piece = chessPieceFactory.makePiece(PieceType.KING, currentTeam, x, y);
         	}
- 
-        	else if(x == 3) {
-        		piece = chessPieceFactory.makePiece(PieceType.QUEEN, PieceTeam.WHITE, x, y);
-        	}  else if(x == 4) {
-        		piece = chessPieceFactory.makePiece(PieceType.KING, PieceTeam.WHITE, x, y);
-        	}
+        	
+        } else if (y == 1 || y == 6) {
+            piece = chessPieceFactory.makePiece(PieceType.PAWN, currentTeam, x, y);
         }
+
         return piece;
     }
     

@@ -1,0 +1,55 @@
+package chessPieces;
+
+import chessGame.Board;
+import chessPieceComponents.PieceIcon;
+import chessPieceComponents.PieceMoveResult;
+import enumTypes.PieceTeam;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import lombok.Getter;
+
+public abstract class Piece extends StackPane {
+
+    @Getter private PieceIcon gamePieceIcon;
+    @Getter private double oldX, oldY;
+    @Getter private PieceTeam type;
+    private double mouseX, mouseY;
+
+    public Piece(PieceTeam type, int x, int y, Color pieceColor) {
+    	this.type = type;
+    	this.gamePieceIcon = new PieceIcon(type, pieceColor);
+        moveTo(x, y);
+        
+        getChildren().add(new ImageView(new Image("C:\\Users\\Lee\\Pictures\\Headshot_Chester_Southwood.jpg")));
+
+        setOnMousePress();
+        setOnMouseDragged();
+    }
+    
+    private void setOnMousePress() {
+    	setOnMousePressed(e -> {
+            mouseX = e.getSceneX();
+            mouseY = e.getSceneY();
+        });
+    }
+    
+    private void setOnMouseDragged() {
+    	setOnMouseDragged(e -> {
+            relocate(e.getSceneX() - mouseX + oldX, e.getSceneY() - mouseY + oldY);
+        });
+    }
+
+    public void moveTo(int newX, int newY) {
+        oldX = newX * Board.TILE_SIZE;
+        oldY = newY * Board.TILE_SIZE;
+        relocate(oldX, oldY);
+    }
+
+    public void abortMove() {
+        relocate(oldX, oldY);
+    }
+    
+    public abstract PieceMoveResult move(int newX, int newY, Board board);
+}

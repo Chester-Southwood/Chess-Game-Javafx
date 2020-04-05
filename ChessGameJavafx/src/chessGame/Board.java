@@ -1,7 +1,7 @@
 package chessGame;
 
-import chessPiece.Piece;
-import chessPiece.PieceMoveResult;
+import chessPieceComponents.PieceMoveResult;
+import chessPieces.Piece;
 import utils.MathUtils;
 
 public class Board {
